@@ -5,7 +5,7 @@ When operation is scheduled, its schedule information is updated.
 
 @author: Vassilissa Lehoux
 '''
-from typing import List
+from typing import List, Optional
 
 
 class OperationScheduleInfo(object):
@@ -19,29 +19,24 @@ class OperationScheduleInfo(object):
         self.duration = duration
         self.energy_consumption = energy_consumption
 
+    @property
+    def end_time(self):
+        return self.schedule_time + self.duration
+
 
 class Operation(object):
     '''
     Operation of the jobs
     '''
 
-    def __init__(self, job_id, operation_id):
-        '''
-        Constructor
-        '''
-        self._job_id = job_id
+    def __init__(self, operation_id: int, job_id: int):
         self._operation_id = operation_id
-        self._predecessors = []
-        self._successors = []
-        self._assigned_to = -1
-        self._processing_time = -1
-        self._energy = -1
-        self._schedule_info = None
+        self._job_id = job_id
+        self._schedule_info: Optional[OperationScheduleInfo] = None
+        self._predecessors: List[Operation] = []
+        self._successors: List[Operation] = []
 
     def __str__(self):
-        '''
-        Returns a string representing the operation.
-        '''
         base_str = f"O{self.operation_id}_J{self.job_id}"
         if self._schedule_info:
             return base_str + f"_M{self.assigned_to}_ci{self.processing_time}_e{self.energy}"
@@ -55,14 +50,10 @@ class Operation(object):
         self._schedule_info = None
 
     def add_predecessor(self, operation):
-        if operation not in self._predecessors:
-            self._predecessors.append(operation)
-            operation.add_successor(self)
+        self._predecessors.append(operation)
 
     def add_successor(self, operation):
-        if operation not in self._successors:
-            self._successors.append(operation)
-            operation.add_predecessor(self)
+        self._successors.append(operation)
 
     @property
     def operation_id(self) -> int:
@@ -82,67 +73,62 @@ class Operation(object):
 
     @property
     def assigned(self) -> bool:
-        return self._assigned_to != -1
+        return self._schedule_info is not None
 
     @property
     def assigned_to(self) -> int:
-        return self._assigned_to
+        return self._schedule_info.machine_id if self.assigned else -1
 
     @property
     def processing_time(self) -> int:
-        return self._processing_time
+        return self._schedule_info.duration if self.assigned else -1
 
     @property
     def start_time(self) -> int:
-        if self._schedule_info:
-            return self._schedule_info.schedule_time
-        return -1
+        return self._schedule_info.schedule_time if self.assigned else -1
 
     @property
     def end_time(self) -> int:
-        if self._schedule_info:
-            return self._schedule_info.schedule_time + self._processing_time
-        return -1
+        return self._schedule_info.end_time if self.assigned else -1
 
     @property
     def energy(self) -> int:
-        return self._energy if self._assigned_to != -1 else -1
+        return self._schedule_info.energy_consumption if self.assigned else -1
 
     def is_ready(self, at_time) -> bool:
-        for predecessor in self._predecessors:
-            if not predecessor.assigned or predecessor.end_time > at_time:
+        for pred in self._predecessors:
+            if not pred.assigned or pred.end_time > at_time:
                 return False
         return True
 
-    def schedule(self, machine_id: int, at_time: int, check_success=True) -> bool:
-        '''
-        Schedules an operation. Updates the schedule information of the operation
-        @param check_success: if True, check if all the preceeding operations have
-          been scheduled and if the schedule time is compatible
-        '''
-        if self._assigned_to != -1:
-            return False
-        if check_success and not self.is_ready(at_time):
-            return False
-        self._assigned_to = machine_id
-        self._schedule_info = OperationScheduleInfo(machine_id, at_time, self._processing_time, self._energy)
+    def schedule(self, machine_id: int, at_time: int, duration: int = -1, energy: int = -1, check_success=True) -> bool:
+        if check_success:
+            for pred in self._predecessors:
+                if not pred.assigned or pred.end_time > at_time:
+                    return False
+        self._schedule_info = OperationScheduleInfo(machine_id, at_time, duration, energy)
         return True
 
     @property
     def min_start_time(self) -> int:
         if not self._predecessors:
             return 0
-        return max(predecessor.end_time for predecessor in self._predecessors)
+        return max([pred.end_time for pred in self._predecessors if pred.assigned], default=0)
 
-    def schedule_at_min_time(self, machine_id: int, min_time: int) -> bool:
-        '''
-        Try and schedule the operation af or after min_time.
-        Return False if not possible
-        '''
-        if self._assigned_to != -1:
-            return False
-        if not self.is_ready(min_time):
-            return False
-        self._assigned_to = machine_id
-        self._schedule_info = OperationScheduleInfo(machine_id, min_time, self._processing_time, self._energy)
-        return True
+    def schedule_at_min_time(self, machine_id: int, min_time: int, duration: int = -1, energy: int = -1) -> bool:
+        min_start = self.min_start_time
+        if min_start < min_time:
+            min_start = min_time
+        return self.schedule(machine_id, min_start, duration, energy)
+
+    @assigned_to.setter
+    def assigned_to(self, value):
+        self._assigned_to = value
+
+    @processing_time.setter
+    def processing_time(self, value):
+        self._processing_time = value
+
+    @energy.setter
+    def energy(self, value):
+        self._energy = value
