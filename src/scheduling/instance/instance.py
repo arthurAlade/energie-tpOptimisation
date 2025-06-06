@@ -60,7 +60,10 @@ class Instance(object):
                                 tear_down_energy, min_consumption, end_time)
                 inst.machines.append(machine)
             pass
-        # To complete
+
+        # calcul
+
+
         raise "Not implemented error"
         return inst
 
