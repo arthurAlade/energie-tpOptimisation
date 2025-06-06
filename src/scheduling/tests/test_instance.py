@@ -20,13 +20,13 @@ class TestInstances(unittest.TestCase):
         pass
 
     def test_from_file(self):
-        self.assertEqual(self.inst.name, "jsp1", 'wrong instance name')
-        self.assertEqual(self.inst.nb_machines, 4, 'wrong nb of machines')
-        self.assertEqual(self.inst.nb_jobs, 2, 'wrong nb of jobs')
-        self.assertEqual(self.inst.nb_operations, 4, 'wrong nb of operations')
-        self.assertEqual(len(self.inst.machines), 4, 'wrong nb of machines')
-        self.assertEqual(len(self.inst.jobs), 2, 'wrong nb of jobs')
-        self.assertEqual(str(self.inst), 'jsp1_M4_J2_O4', 'wrong string representation of the instance')
+        self.assertEqual("jsp1", self.inst.name, 'wrong instance name')
+        self.assertEqual(4, self.inst.nb_machines, 'wrong nb of machines')
+        self.assertEqual(2, self.inst.nb_jobs, 'wrong nb of jobs')
+        self.assertEqual(4, self.inst.nb_operations, 'wrong nb of operations')
+        self.assertEqual(4, len(self.inst.machines), 'wrong nb of machines')
+        self.assertEqual(2, len(self.inst.jobs),  'wrong nb of jobs')
+        self.assertEqual('jsp1_M4_J2_O4', str(self.inst),  'wrong string representation of the instance')
         
 
 if __name__ == "__main__":

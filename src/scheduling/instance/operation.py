@@ -5,7 +5,7 @@ When operation is scheduled, its schedule information is updated.
 
 @author: Vassilissa Lehoux
 '''
-from typing import List
+from typing import List, Optional
 
 
 class OperationScheduleInfo(object):
@@ -14,7 +14,14 @@ class OperationScheduleInfo(object):
     '''
 
     def __init__(self, machine_id: int, schedule_time: int, duration: int, energy_consumption: int):
-        raise "Not implemented error"
+        self.machine_id = machine_id
+        self.schedule_time = schedule_time
+        self.duration = duration
+        self.energy_consumption = energy_consumption
+
+    @property
+    def end_time(self):
+        return self.schedule_time + self.duration
 
 
 class Operation(object):
@@ -22,16 +29,14 @@ class Operation(object):
     Operation of the jobs
     '''
 
-    def __init__(self, job_id, operation_id):
-        '''
-        Constructor
-        '''
-        raise "Not implemented error"
+    def __init__(self, operation_id: int, job_id: int):
+        self._operation_id = operation_id
+        self._job_id = job_id
+        self._schedule_info: Optional[OperationScheduleInfo] = None
+        self._predecessors: List[Operation] = []
+        self._successors: List[Operation] = []
 
     def __str__(self):
-        '''
-        Returns a string representing the operation.
-        '''
         base_str = f"O{self.operation_id}_J{self.job_id}"
         if self._schedule_info:
             return base_str + f"_M{self.assigned_to}_ci{self.processing_time}_e{self.energy}"
@@ -42,119 +47,88 @@ class Operation(object):
         return str(self)
 
     def reset(self):
-        '''
-        Removes scheduling informations
-        '''
-        raise "Not implemented error"
+        self._schedule_info = None
 
     def add_predecessor(self, operation):
-        '''
-        Adds a predecessor to the operation
-        '''
-        raise "Not implemented error"
+        self._predecessors.append(operation)
 
     def add_successor(self, operation):
-        '''
-        Adds a successor operation
-        '''
-        raise "Not implemented error"
+        self._successors.append(operation)
 
     @property
     def operation_id(self) -> int:
-        raise "Not implemented error"
+        return self._operation_id
 
     @property
     def job_id(self) -> int:
-        raise "Not implemented error"
+        return self._job_id
 
     @property
     def predecessors(self) -> List:
-        """
-        Returns a list of the predecessor operations
-        """
-        raise "Not implemented error"
+        return self._predecessors
 
     @property
     def successors(self) -> List:
-        '''
-        Returns a list of the successor operations
-        '''
-        raise "Not implemented error"
+        return self._successors
 
     @property
     def assigned(self) -> bool:
-        '''
-        Returns True if the operation is assigned
-        and False otherwise
-        '''
-        raise "Not implemented error"
+        return self._schedule_info is not None
 
     @property
     def assigned_to(self) -> int:
-        '''
-        Returns the machine ID it is assigned to if any
-        and -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._schedule_info.machine_id if self.assigned else -1
 
     @property
     def processing_time(self) -> int:
-        '''
-        Returns the processing time if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._schedule_info.duration if self.assigned else -1
 
     @property
     def start_time(self) -> int:
-        '''
-        Returns the start time if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._schedule_info.schedule_time if self.assigned else -1
 
     @property
     def end_time(self) -> int:
-        '''
-        Returns the end time if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._schedule_info.end_time if self.assigned else -1
 
     @property
     def energy(self) -> int:
-        '''
-        Returns the energy consumption if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._schedule_info.energy_consumption if self.assigned else -1
 
     def is_ready(self, at_time) -> bool:
-        '''
-        Returns True if all the predecessors are assigned
-        and processed before at_time.
-        False otherwise
-        '''
-        raise "Not implemented error"
+        for pred in self._predecessors:
+            if not pred.assigned or pred.end_time > at_time:
+                return False
+        return True
 
-    def schedule(self, machine_id: int, at_time: int, check_success=True) -> bool:
-        '''
-        Schedules an operation. Updates the schedule information of the operation
-        @param check_success: if True, check if all the preceeding operations have
-          been scheduled and if the schedule time is compatible
-        '''
-        raise "Not implemented error"
+    def schedule(self, machine_id: int, at_time: int, duration: int = -1, energy: int = -1, check_success=True) -> bool:
+        if check_success:
+            for pred in self._predecessors:
+                if not pred.assigned or pred.end_time > at_time:
+                    return False
+        self._schedule_info = OperationScheduleInfo(machine_id, at_time, duration, energy)
+        return True
 
     @property
     def min_start_time(self) -> int:
-        '''
-        Minimum start time given the precedence constraints
-        '''
-        raise "Not implemented error"
+        if not self._predecessors:
+            return 0
+        return max([pred.end_time for pred in self._predecessors if pred.assigned], default=0)
 
-    def schedule_at_min_time(self, machine_id: int, min_time: int) -> bool:
-        '''
-        Try and schedule the operation af or after min_time.
-        Return False if not possible
-        '''
-        raise "Not implemented error"
+    def schedule_at_min_time(self, machine_id: int, min_time: int, duration: int = -1, energy: int = -1) -> bool:
+        min_start = self.min_start_time
+        if min_start < min_time:
+            min_start = min_time
+        return self.schedule(machine_id, min_start, duration, energy)
+
+    @assigned_to.setter
+    def assigned_to(self, value):
+        self._assigned_to = value
+
+    @processing_time.setter
+    def processing_time(self, value):
+        self._processing_time = value
+
+    @energy.setter
+    def energy(self, value):
+        self._energy = value
