@@ -14,7 +14,10 @@ class OperationScheduleInfo(object):
     '''
 
     def __init__(self, machine_id: int, schedule_time: int, duration: int, energy_consumption: int):
-        raise "Not implemented error"
+        self.machine_id = machine_id
+        self.schedule_time = schedule_time
+        self.duration = duration
+        self.energy_consumption = energy_consumption
 
 
 class Operation(object):
