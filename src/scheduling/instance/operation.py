@@ -26,7 +26,14 @@ class Operation(object):
         '''
         Constructor
         '''
-        raise "Not implemented error"
+        self._job_id = job_id
+        self._operation_id = operation_id
+        self._predecessors = []
+        self._successors = []
+        self._assigned_to = -1
+        self._processing_time = -1
+        self._energy = -1
+        self._schedule_info = None
 
     def __str__(self):
         '''
@@ -42,100 +49,67 @@ class Operation(object):
         return str(self)
 
     def reset(self):
-        '''
-        Removes scheduling informations
-        '''
-        raise "Not implemented error"
+        self._schedule_info = None
 
     def add_predecessor(self, operation):
-        '''
-        Adds a predecessor to the operation
-        '''
-        raise "Not implemented error"
+        if operation not in self._predecessors:
+            self._predecessors.append(operation)
+            operation.add_successor(self)
 
     def add_successor(self, operation):
-        '''
-        Adds a successor operation
-        '''
-        raise "Not implemented error"
+        if operation not in self._successors:
+            self._successors.append(operation)
+            operation.add_predecessor(self)
 
     @property
     def operation_id(self) -> int:
-        raise "Not implemented error"
+        return self._operation_id
 
     @property
     def job_id(self) -> int:
-        raise "Not implemented error"
+        return self._job_id
 
     @property
     def predecessors(self) -> List:
-        """
-        Returns a list of the predecessor operations
-        """
-        raise "Not implemented error"
+        return self._predecessors
 
     @property
     def successors(self) -> List:
-        '''
-        Returns a list of the successor operations
-        '''
-        raise "Not implemented error"
+        return self._successors
 
     @property
     def assigned(self) -> bool:
-        '''
-        Returns True if the operation is assigned
-        and False otherwise
-        '''
-        raise "Not implemented error"
+        return self._assigned_to != -1
 
     @property
     def assigned_to(self) -> int:
-        '''
-        Returns the machine ID it is assigned to if any
-        and -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._assigned_to
 
     @property
     def processing_time(self) -> int:
-        '''
-        Returns the processing time if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._processing_time
 
     @property
     def start_time(self) -> int:
-        '''
-        Returns the start time if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        if self._schedule_info:
+            return self._schedule_info.schedule_time
+        return -1
 
     @property
     def end_time(self) -> int:
-        '''
-        Returns the end time if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        if self._schedule_info:
+            return self._schedule_info.schedule_time + self._processing_time
+        return -1
 
     @property
     def energy(self) -> int:
-        '''
-        Returns the energy consumption if is assigned,
-        -1 otherwise
-        '''
-        raise "Not implemented error"
+        return self._energy if self._assigned_to != -1 else -1
 
     def is_ready(self, at_time) -> bool:
-        '''
-        Returns True if all the predecessors are assigned
-        and processed before at_time.
-        False otherwise
-        '''
-        raise "Not implemented error"
+        for predecessor in self._predecessors:
+            if not predecessor.assigned or predecessor.end_time > at_time:
+                return False
+        return True
 
     def schedule(self, machine_id: int, at_time: int, check_success=True) -> bool:
         '''
@@ -143,18 +117,29 @@ class Operation(object):
         @param check_success: if True, check if all the preceeding operations have
           been scheduled and if the schedule time is compatible
         '''
-        raise "Not implemented error"
+        if self._assigned_to != -1:
+            return False
+        if check_success and not self.is_ready(at_time):
+            return False
+        self._assigned_to = machine_id
+        self._schedule_info = OperationScheduleInfo(machine_id, at_time, self._processing_time, self._energy)
+        return True
 
     @property
     def min_start_time(self) -> int:
-        '''
-        Minimum start time given the precedence constraints
-        '''
-        raise "Not implemented error"
+        if not self._predecessors:
+            return 0
+        return max(predecessor.end_time for predecessor in self._predecessors)
 
     def schedule_at_min_time(self, machine_id: int, min_time: int) -> bool:
         '''
         Try and schedule the operation af or after min_time.
         Return False if not possible
         '''
-        raise "Not implemented error"
+        if self._assigned_to != -1:
+            return False
+        if not self.is_ready(min_time):
+            return False
+        self._assigned_to = machine_id
+        self._schedule_info = OperationScheduleInfo(machine_id, min_time, self._processing_time, self._energy)
+        return True
