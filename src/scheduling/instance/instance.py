@@ -32,15 +32,34 @@ class Instance(object):
             header = next(csv_reader)
             for row in csv_reader:
                 # To complete
-                pass
+                job_id = int(row[0])
+                operation_id = int(row[1])
+
+                operation = Operation(operation_id, job_id)
+                operation.assigned_to = int (row[2])
+                operation.processing_time = int(row[3])
+                operation.energy = int(row[4])
+                
+                inst.operations.append(operation)
+            pass
 
         # reading machine info
         with open(folderpath + os.path.sep + inst._instance_name + '_mach.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
             header = next(csv_reader)
             for row in csv_reader:
-                # To complete
-                pass
+                machine_id = int(row[0])
+                set_up_time = int(row[1])
+                set_up_energy = int(row[2])
+                tear_down_time = int(row[3])
+                tear_down_energy = int(row[4])
+                min_consumption = int(row[5])
+                end_time = int(row[6])
+                
+                machine = Machine(machine_id, set_up_time, set_up_energy, tear_down_time,
+                                tear_down_energy, min_consumption, end_time)
+                inst.machines.append(machine)
+            pass
         # To complete
         raise "Not implemented error"
         return inst
