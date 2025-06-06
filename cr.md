@@ -34,7 +34,7 @@ L'entreprise vise à optimiser les critères suivants, souvent antagonistes :
 - Minimisation de la durée totale du planning: Achever toutes les tâches le plus rapidement possible.
 - Minimisation de la durée moyenne d'exécution des tâches: Réduire le temps moyen nécessaire pour compléter chaque tâche.
 
-#### Fonction Objectif Agrégée
+### Fonction Objectif Agrégée
 
 Une fonction objectif unique peut être formulée comme une combinaison pondérée des différents objectifs, permettant de trouver un compromis. L'objectif est de minimiser la valeur Z:
 
