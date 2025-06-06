@@ -22,9 +22,9 @@ class TestSolution(unittest.TestCase):
     def test_init_sol(self):
         sol = Solution(self.inst1)
         self.assertEqual(len(sol.all_operations), len(self.inst1.operations),
-                         'Nb of operations should be the same between instance and solution')
+                        'Nb of operations should be the same between instance and solution')
         self.assertEqual(len(sol.available_operations), len(self.inst1.jobs),
-                         'One operation per job should be available for scheduling')
+                        'One operation per job should be available for scheduling')
 
     def test_schedule_op(self):
         sol = Solution(self.inst1)

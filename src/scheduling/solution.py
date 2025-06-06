@@ -20,8 +20,10 @@ class Solution(object):
     def __init__(self, instance: Instance):
         '''
         Constructor
+        @param instance: the instance to which the solution is associated
         '''
-        raise "Not implemented error"
+        self._instance = instance
+        self.reset()
 
 
     @property
@@ -29,14 +31,17 @@ class Solution(object):
         '''
         Returns the associated instance
         '''
-        raise "Not implemented error"
+        return self._instance
 
 
     def reset(self):
         '''
         Resets the solution: everything needs to be replanned
         '''
-        raise "Not implemented error"
+        for operation in self.inst.operations:
+            operation.reset()
+        for machine in self.inst.machines:
+            machine.reset()
 
     @property
     def is_feasible(self) -> bool:
@@ -44,35 +49,38 @@ class Solution(object):
         Returns True if the solution respects the constraints.
         To call this function, all the operations must be planned.
         '''
-        raise "Not implemented error"
+        return all(operation.assigned for operation in self.inst.operations) and \
+            all(machine.is_feasible for machine in self.inst.machines)
 
     @property
     def evaluate(self) -> int:
         '''
         Computes the value of the solution
         '''
-        raise "Not implemented error"
+        if not self.is_feasible:
+            return float('inf')
+        return self.objective
 
     @property
     def objective(self) -> int:
         '''
         Returns the value of the objective function
         '''
-        raise "Not implemented error"
+        return self._instance.objective
 
     @property
     def cmax(self) -> int:
         '''
         Returns the maximum completion time of a job
         '''
-        raise "Not implemented error"
+        return self._instance.cmax
 
     @property
     def sum_ci(self) -> int:
         '''
         Returns the sum of completion times of all the jobs
         '''
-        raise "Not implemented error"
+        return self._instance.sum_ci
 
     @property
     def total_energy_consumption(self) -> int:
@@ -80,13 +88,17 @@ class Solution(object):
         Returns the total energy consumption for processing
         all the jobs (including energy for machine switched on but doing nothing).
         '''
-        raise "Not implemented error"
+        return self._instance.total_energy_consumption
 
     def __str__(self) -> str:
         '''
         String representation of the solution
         '''
-        return ""
+        return f"Solution for {self.inst.name}:\n" + \
+            f"  Cmax: {self.cmax}\n" + \
+            f"  Sum of completion times: {self.sum_ci}\n" + \
+            f"  Total energy consumption: {self.total_energy_consumption}\n" + \
+            f"  Feasible: {self.is_feasible}"
 
     def to_csv(self):
         '''
@@ -120,7 +132,7 @@ class Solution(object):
         '''
         Returns all the operations in the instance
         '''
-        raise "Not implemented error"
+        return self.inst.operations
 
     def schedule(self, operation: Operation, machine: Machine):
         '''
@@ -129,7 +141,10 @@ class Solution(object):
         @param operation: an operation that is available for scheduling
         '''
         assert(operation in self.available_operations)
-        raise "Not implemented error"
+        assert(machine in self.inst.machines)
+        assert(operation.assigned is False)
+        assert(machine.available_time >= operation.start_time)
+        machine.add_operation(operation, operation.start_time)
 
     def gantt(self, colormapname):
         """
