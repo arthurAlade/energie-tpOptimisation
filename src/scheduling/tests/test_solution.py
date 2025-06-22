@@ -21,15 +21,15 @@ class TestSolution(unittest.TestCase):
 
     def test_init_sol(self):
         sol = Solution(self.inst)
-        self.assertEqual(len(sol.all_operations), len(self.inst.operations),
+        self.assertEqual(len(sol.all_operations), len(self.inst._operations),
                         'Nb of operations should be the same between instance and solution')
-        self.assertEqual(len(sol.available_operations), len(self.inst.jobs),
+        self.assertEqual(len(sol.available_operations), len(self.inst._jobs),
                         'One operation per job should be available for scheduling')
 
     def test_schedule_op(self):
         sol = Solution(self.inst)
-        operation = self.inst.operations[0]
-        machine = self.inst.machines[1]
+        operation = self.inst._operations[0]
+        machine = self.inst._machines[1]
         sol.schedule(operation, machine)
         self.assertEqual(operation.assigned, True, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 1, 'wrong machine machine')
@@ -39,7 +39,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(operation.end_time, 32, 'wrong operation end time')
         self.assertEqual(machine.available_time, 32, 'wrong available time')
         self.assertEqual(machine.working_time, 120, 'wrong working time for machine')
-        operation = self.inst.operations[2]
+        operation = self.inst._operations[2]
         sol.schedule(operation, machine)
         self.assertEqual(operation.assigned, True, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 1, 'wrong machine machine')
@@ -49,8 +49,8 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(operation.end_time, 41, 'wrong operation end time')
         self.assertEqual(machine.available_time, 41, 'wrong available time')
         self.assertEqual(machine.working_time, 120, 'wrong working time for machine')
-        operation = self.inst.operations[1]
-        machine = self.inst.machines[0]
+        operation = self.inst._operations[1]
+        machine = self.inst._machines[0]
         sol.schedule(operation, machine)
         self.assertEqual(operation.assigned, True, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 0, 'wrong machine machine')
@@ -62,7 +62,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(machine.working_time, 83, 'wrong working time for machine')
         self.assertEqual(machine.start_times[0], 17)
         self.assertEqual(machine.stop_times[0], 100)
-        operation = self.inst.operations[3]
+        operation = self.inst._operations[3]
         sol.schedule(operation, machine)
         self.assertEqual(operation.assigned, True, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 0, 'wrong machine machine')

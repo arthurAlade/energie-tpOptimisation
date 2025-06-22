@@ -124,7 +124,7 @@ class Solution(object):
         Returns the available operations for scheduling:
         all constraints have been met for those operations to start
         '''
-        raise "Not implemented error"
+        return [op for op in self.inst.operations if not op.assigned]
 
     @property
     def all_operations(self) -> List[Operation]:
