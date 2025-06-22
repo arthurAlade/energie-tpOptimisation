@@ -23,7 +23,6 @@ class Solution(object):
         @param instance: the instance to which the solution is associated
         '''
         self._instance = instance
-        self.reset()
 
 
     @property
@@ -38,9 +37,9 @@ class Solution(object):
         '''
         Resets the solution: everything needs to be replanned
         '''
-        for operation in self.inst.operations:
+        for operation in self.inst._operations:
             operation.reset()
-        for machine in self.inst.machines:
+        for machine in self.inst._machines:
             machine.reset()
 
     @property
@@ -49,8 +48,8 @@ class Solution(object):
         Returns True if the solution respects the constraints.
         To call this function, all the operations must be planned.
         '''
-        return all(operation.assigned for operation in self.inst.operations) and \
-            all(machine.is_feasible for machine in self.inst.machines)
+        return all(operation.assigned for operation in self.inst._operations) and \
+            all(machine.is_feasible for machine in self.inst._machines)
 
     @property
     def evaluate(self) -> int:
@@ -132,7 +131,7 @@ class Solution(object):
         '''
         Returns all the operations in the instance
         '''
-        return self.inst.operations
+        return self.inst._operations
 
     def schedule(self, operation: Operation, machine: Machine):
         '''
@@ -141,7 +140,7 @@ class Solution(object):
         @param operation: an operation that is available for scheduling
         '''
         assert(operation in self.available_operations)
-        assert(machine in self.inst.machines)
+        assert(machine in self.inst._machines)
         assert(operation.assigned is False)
         assert(machine.available_time >= operation.start_time)
         machine.add_operation(operation, operation.start_time)
@@ -153,7 +152,7 @@ class Solution(object):
         """
         fig, ax = plt.subplots()
         colormap = colormaps[colormapname]
-        for machine in self.inst.machines:
+        for machine in self.inst._machines:
             machine_operations = sorted(machine.scheduled_operations, key=lambda op: op.start_time)
             for operation in machine_operations:
                 operation_start = operation.start_time
