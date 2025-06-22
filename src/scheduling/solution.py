@@ -124,7 +124,11 @@ class Solution(object):
         Returns the available operations for scheduling:
         all constraints have been met for those operations to start
         '''
+<<<<<<< HEAD
         return [op for op in self.all_operations if not op.assigned and op.is_ready(op.min_start_time)]
+=======
+        return [op for op in self.inst.operations if not op.assigned]
+>>>>>>> 5e273d938c05c9fb0bbd648184186014e7a3c57a
 
     @property
     def all_operations(self) -> List[Operation]:
