@@ -14,7 +14,6 @@ class TestJob(unittest.TestCase):
     def setUp(self):
         self.inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp1")
 
-
     def tearDown(self):
         del self.inst
 
@@ -27,7 +26,6 @@ class TestJob(unittest.TestCase):
 
         expected = max(op.end_time for op in job.operations)
         self.assertEqual(job.completion_time, expected)
-
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
