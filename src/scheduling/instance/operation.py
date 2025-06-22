@@ -18,6 +18,7 @@ class OperationScheduleInfo(object):
         self.schedule_time = schedule_time
         self.duration = duration
         self.energy_consumption = energy_consumption
+        self._assigned = False  # ou selon ta logique
 
     @property
     def end_time(self):
@@ -121,14 +122,3 @@ class Operation(object):
             min_start = min_time
         return self.schedule(machine_id, min_start, duration, energy)
 
-    @assigned_to.setter
-    def assigned_to(self, value):
-        self._assigned_to = value
-
-    @processing_time.setter
-    def processing_time(self, value):
-        self._processing_time = value
-
-    @energy.setter
-    def energy(self, value):
-        self._energy = value

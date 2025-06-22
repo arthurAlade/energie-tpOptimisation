@@ -1,8 +1,3 @@
-'''
-Test of the Solution class.
-
-@author: Vassilissa Lehoux
-'''
 import unittest
 import os
 
@@ -31,7 +26,7 @@ class TestSolution(unittest.TestCase):
         operation = self.inst._operations[0]
         machine = self.inst._machines[1]
         sol.schedule(operation, machine)
-        self.assertEqual(operation.assigned, True, 'operation should be assigned')
+        self.assertTrue(operation.assigned, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 1, 'wrong machine machine')
         self.assertEqual(operation.processing_time, 12, 'wrong operation duration')
         self.assertEqual(operation.energy, 12, 'wrong operation energy cost')
@@ -41,7 +36,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(machine.working_time, 120, 'wrong working time for machine')
         operation = self.inst._operations[2]
         sol.schedule(operation, machine)
-        self.assertEqual(operation.assigned, True, 'operation should be assigned')
+        self.assertTrue(operation.assigned, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 1, 'wrong machine machine')
         self.assertEqual(operation.processing_time, 9, 'wrong operation duration')
         self.assertEqual(operation.energy, 10, 'wrong operation energy cost')
@@ -52,7 +47,7 @@ class TestSolution(unittest.TestCase):
         operation = self.inst._operations[1]
         machine = self.inst._machines[0]
         sol.schedule(operation, machine)
-        self.assertEqual(operation.assigned, True, 'operation should be assigned')
+        self.assertTrue(operation.assigned, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 0, 'wrong machine machine')
         self.assertEqual(operation.processing_time, 5, 'wrong operation duration')
         self.assertEqual(operation.energy, 6, 'wrong operation energy cost')
@@ -64,7 +59,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(machine.stop_times[0], 100)
         operation = self.inst._operations[3]
         sol.schedule(operation, machine)
-        self.assertEqual(operation.assigned, True, 'operation should be assigned')
+        self.assertTrue(operation.assigned, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 0, 'wrong machine machine')
         self.assertEqual(operation.processing_time, 10, 'wrong operation duration')
         self.assertEqual(operation.energy, 9, 'wrong operation energy cost')
@@ -74,23 +69,33 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(machine.working_time, 83, 'wrong working time for machine')
         self.assertEqual(machine.start_times[0], 17)
         self.assertEqual(machine.stop_times[0], 100)
+
         self.assertTrue(sol.is_feasible, 'Solution should be feasible')
+
+        # Sauvegarder le diagramme de Gantt (nécessite matplotlib)
         plt = sol.gantt('tab20')
-        plt.savefig(TEST_FOLDER + os.path.sep +  'temp.png')
+        plt.savefig(TEST_FOLDER + os.path.sep + 'temp.png')
 
-        def test_objective(self):
-            '''
-            Test your objective function
-            '''
-            pass
+    def test_objective(self):
+        '''
+        Test your objective function
+        '''
+        sol = Solution(self.inst)
+        # Exemple d’appel de la fonction objective (adapter selon ta classe)
+        obj_val = sol.objective()
+        self.assertIsInstance(obj_val, (int, float), 'Objective value should be a number')
+        # Tu peux ajouter des assertions plus spécifiques selon la fonction
 
-        def test_evaluate(self):
-            '''
-            Test your evaluate function
-            '''
-            pass
+    def test_evaluate(self):
+        '''
+        Test your evaluate function
+        '''
+        sol = Solution(self.inst)
+        sol.evaluate()  # Adapter en fonction de ton API
+        # Par exemple, vérifier que les propriétés ou états attendus sont bien mis à jour
+        self.assertTrue(sol.is_feasible, 'Solution should be feasible after evaluation')
+        # Plus d’assertions possibles selon ta méthode evaluate
 
 
 if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
