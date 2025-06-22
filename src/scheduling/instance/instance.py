@@ -36,13 +36,27 @@ class Instance(object):
                 operation_id = int(row[1])
 
                 operation = Operation(operation_id, job_id)
-                operation.assigned_to = int(row[2])
-                operation.processing_time = int(row[3])
-                operation.energy = int(row[4])
+                # appelle schedule avec les valeurs lues dans le CSV
+                machine_id = int(row[2])
+                processing_time = int(row[3])
+                energy = int(row[4])
+                # Choisissons un start_time par défaut, par exemple 0, car ce n’est pas dans le CSV
+                start_time = 0
+                operation.schedule(machine_id, start_time, processing_time, energy)
 
-                inst._jobs.append(job_id) if job_id not in inst._jobs else None
-                inst._operations.append(operation_id) if operation_id not in inst._operations else None
+                # Crée le Job si pas déjà présent
+                if not any(j.job_id == job_id for j in inst._jobs):
+                    inst._jobs.append(Job(job_id))
 
+                # Ajoute l'opération au bon job
+                for job in inst._jobs:
+                    if job.job_id == job_id:
+                        job.add_operation(operation)
+                        break
+
+                # Ajoute l'opération à la liste globale
+                if operation_id not in inst._operations:
+                    inst._operations.append(operation)
 
         # Reading machine info
         with open(folderpath + os.path.sep + inst._instance_name + '_mach.csv', 'r') as csv_file:
@@ -110,7 +124,7 @@ class Instance(object):
 
     def get_job(self, job_id) -> Job:
         for j in self._jobs:
-            if j.job_id == job_id:
+            if j._job_id == job_id:
                 return j
         raise ValueError(f"Job ID {job_id} not found")
 

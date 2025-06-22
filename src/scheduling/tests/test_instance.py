@@ -15,7 +15,7 @@ class TestInstances(unittest.TestCase):
         self.inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp1")
 
     def tearDown(self):
-        del self.inst
+        del self.inst # reset
 
     def test_from_file(self):
         self.assertEqual("jsp1", self.inst.name, 'wrong instance name')
