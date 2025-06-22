@@ -9,15 +9,13 @@ import os
 from src.scheduling.instance.instance import Instance
 from src.scheduling.tests.test_utils import TEST_FOLDER_DATA
 
-
 class TestInstances(unittest.TestCase):
-
 
     def setUp(self):
         self.inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp1")
 
     def tearDown(self):
-        pass
+        del self.inst
 
     def test_from_file(self):
         self.assertEqual("jsp1", self.inst.name, 'wrong instance name')
@@ -27,7 +25,7 @@ class TestInstances(unittest.TestCase):
         self.assertEqual(4, len(self.inst.machines), 'wrong nb of machines')
         self.assertEqual(2, len(self.inst.jobs),  'wrong nb of jobs')
         self.assertEqual('jsp1_M4_J2_O4', str(self.inst),  'wrong string representation of the instance')
-        
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
