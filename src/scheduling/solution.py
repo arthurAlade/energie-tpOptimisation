@@ -43,22 +43,14 @@ class Solution(object):
             machine.reset()
 
     @property
-    def is_feasible(self) -> bool:
-        '''
-        Returns True if the solution respects the constraints.
-        To call this function, all the operations must be planned.
-        '''
-        return all(operation.assigned for operation in self.inst._operations) and \
-            all(machine.is_feasible for machine in self.inst._machines)
+    def is_feasible(self):
+        return all(op.assigned for op in self.all_operations)
 
-    @property
-    def evaluate(self) -> int:
-        '''
-        Computes the value of the solution
-        '''
-        if not self.is_feasible:
-            return float('inf')
-        return self.objective
+    def evaluate(self):
+        for op in self.available_operations:
+            best_machine = 0
+            pt, e = op.machine_infos[best_machine]
+            op.schedule(best_machine, op.min_start_time, pt, e, check_success=False)
 
     @property
     def objective(self) -> int:
@@ -124,11 +116,7 @@ class Solution(object):
         Returns the available operations for scheduling:
         all constraints have been met for those operations to start
         '''
-<<<<<<< HEAD
         return [op for op in self.all_operations if not op.assigned and op.is_ready(op.min_start_time)]
-=======
-        return [op for op in self.inst.operations if not op.assigned]
->>>>>>> 5e273d938c05c9fb0bbd648184186014e7a3c57a
 
     @property
     def all_operations(self) -> List[Operation]:

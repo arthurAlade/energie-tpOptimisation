@@ -18,7 +18,6 @@ class OperationScheduleInfo(object):
         self.schedule_time = schedule_time
         self.duration = duration
         self.energy_consumption = energy_consumption
-        self._assigned = False  # ou selon ta logique
 
     @property
     def end_time(self):
@@ -30,12 +29,15 @@ class Operation(object):
     Operation of the jobs
     '''
 
-    def __init__(self, operation_id: int, job_id: int):
+    def __init__(self, operation_id, job_id):
         self._operation_id = operation_id
         self._job_id = job_id
+        self._assigned = False
+        self._previous_operation = None
         self._schedule_info: Optional[OperationScheduleInfo] = None
         self._predecessors: List[Operation] = []
         self._successors: List[Operation] = []
+        self.machine_infos = {}
 
     def __str__(self):
         base_str = f"O{self.operation_id}_J{self.job_id}"
@@ -96,11 +98,15 @@ class Operation(object):
     def energy(self) -> int:
         return self._schedule_info.energy_consumption if self.assigned else -1
 
-    def is_ready(self, at_time) -> bool:
-        for pred in self._predecessors:
-            if not pred.assigned or pred.end_time > at_time:
-                return False
-        return True
+    def is_ready(self, current_time: int) -> bool:
+        """
+        Vérifie si l'opération est prête à être planifiée :
+        - si elle est la première de son job, elle est prête dès t=0
+        - sinon, elle est prête seulement si l'opération précédente est terminée
+        """
+        if self.previous_operation is None:
+            return True
+        return self.previous_operation.assigned and self.previous_operation.end_time <= current_time
 
     def schedule(self, machine_id: int, at_time: int, duration: int = -1, energy: int = -1, check_success=True) -> bool:
         if check_success:
@@ -121,4 +127,12 @@ class Operation(object):
         if min_start < min_time:
             min_start = min_time
         return self.schedule(machine_id, min_start, duration, energy)
+
+    @property
+    def previous_operation(self):
+        return self._previous_operation
+
+    @previous_operation.setter
+    def previous_operation(self, operation):
+        self._previous_operation = operation
 

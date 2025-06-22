@@ -12,7 +12,7 @@ class TestSolution(unittest.TestCase):
         self.inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp1")
 
     def tearDown(self):
-        pass
+        del self.inst
 
     def test_init_sol(self):
         sol = Solution(self.inst)
@@ -81,20 +81,20 @@ class TestSolution(unittest.TestCase):
         Test your objective function
         '''
         sol = Solution(self.inst)
-        # Exemple d’appel de la fonction objective (adapter selon ta classe)
-        obj_val = sol.objective()
-        self.assertIsInstance(obj_val, (int, float), 'Objective value should be a number')
-        # Tu peux ajouter des assertions plus spécifiques selon la fonction
 
-    def test_evaluate(self):
-        '''
-        Test your evaluate function
-        '''
-        sol = Solution(self.inst)
-        sol.evaluate()  # Adapter en fonction de ton API
-        # Par exemple, vérifier que les propriétés ou états attendus sont bien mis à jour
-        self.assertTrue(sol.is_feasible, 'Solution should be feasible after evaluation')
-        # Plus d’assertions possibles selon ta méthode evaluate
+        obj_val = sol.objective
+        self.assertIsInstance(obj_val, (int, float), 'Objective value should be a number')
+
+    def test_schedule_op(self):
+        job = self.inst.get_job(0)
+        operation = job.operations[0]
+
+        operation.machine_infos[0] = (12, 3)
+
+        scheduled = operation.schedule(machine_id=0, at_time=0, duration=12, energy=3, check_success=False)
+
+        self.assertTrue(scheduled, "Schedule should succeed")
+        self.assertEqual(operation.processing_time, 12, 'wrong operation duration')
 
 
 if __name__ == "__main__":

@@ -40,7 +40,7 @@ class Instance(object):
                 energy = int(row[4])
 
                 start_time = 0
-                operation.schedule(machine_id, start_time, processing_time, energy)
+                operation.machine_infos[machine_id] = (processing_time, energy)
 
                 if not any(j.job_id == job_id for j in inst._jobs):
                     inst._jobs.append(Job(job_id))
@@ -52,6 +52,11 @@ class Instance(object):
 
                 if operation_id not in inst._operations:
                     inst._operations.append(operation)
+
+                for job in inst._jobs:
+                    job.operations.sort(key=lambda op: op.operation_id)
+                    for i in range(1, len(job.operations)):
+                        job.operations[i].previous_operation = job.operations[i - 1]
 
         # Reading machine info
         with open(folderpath + os.path.sep + inst._instance_name + '_mach.csv', 'r') as csv_file:
@@ -83,6 +88,23 @@ class Instance(object):
     @property
     def name(self):
         return self._instance_name
+
+    @property
+    def cmax(self):
+        assigned_ops = [op.end_time for op in self._operations if op.assigned]
+        return max(assigned_ops) if assigned_ops else 0
+
+    @property
+    def sum_ci(self):
+        return sum(op.end_time for op in self._operations if op.assigned)
+
+    @property
+    def total_energy_consumption(self):
+        return sum(op.energy for op in self._operations if op.assigned)
+
+    @property
+    def objective(self):
+        return self.cmax + self.total_energy_consumption
 
     @property
     def machines(self) -> List[Machine]:
