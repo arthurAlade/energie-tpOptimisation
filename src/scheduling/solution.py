@@ -110,13 +110,13 @@ class Solution(object):
           One line per pair of (start time, stop time) for the machine
           header: "machine_id, start_time, stop_time"
         '''
-        raise "Not implemented error"
+        raise NotImplementedError("Not implemented")
 
     def from_csv(self, inst_folder, operation_file, machine_file):
         '''
         Reads a solution from the instance folder
         '''
-        raise "Not implemented error"
+        raise NotImplementedError("Not implemented")
 
     @property
     def available_operations(self)-> List[Operation]:
@@ -124,7 +124,7 @@ class Solution(object):
         Returns the available operations for scheduling:
         all constraints have been met for those operations to start
         '''
-        raise "Not implemented error"
+        return [op for op in self.all_operations if not op.assigned and op.is_ready(op.min_start_time)]
 
     @property
     def all_operations(self) -> List[Operation]:

@@ -27,7 +27,6 @@ class Instance(object):
     def from_file(cls, folderpath):
         inst = cls(os.path.basename(folderpath))
 
-        # Reading the operation info
         with open(folderpath + os.path.sep + inst._instance_name + '_op.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
             header = next(csv_reader)
@@ -36,25 +35,21 @@ class Instance(object):
                 operation_id = int(row[1])
 
                 operation = Operation(operation_id, job_id)
-                # appelle schedule avec les valeurs lues dans le CSV
                 machine_id = int(row[2])
                 processing_time = int(row[3])
                 energy = int(row[4])
-                # Choisissons un start_time par défaut, par exemple 0, car ce n’est pas dans le CSV
+
                 start_time = 0
                 operation.schedule(machine_id, start_time, processing_time, energy)
 
-                # Crée le Job si pas déjà présent
                 if not any(j.job_id == job_id for j in inst._jobs):
                     inst._jobs.append(Job(job_id))
 
-                # Ajoute l'opération au bon job
                 for job in inst._jobs:
                     if job.job_id == job_id:
                         job.add_operation(operation)
                         break
 
-                # Ajoute l'opération à la liste globale
                 if operation_id not in inst._operations:
                     inst._operations.append(operation)
 

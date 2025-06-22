@@ -21,11 +21,10 @@ class TestInstances(unittest.TestCase):
         self.assertEqual("jsp1", self.inst.name, 'wrong instance name')
         self.assertEqual(4, self.inst.nb_machines, 'wrong nb of machines')
         self.assertEqual(2, self.inst.nb_jobs, 'wrong nb of jobs')
-        self.assertEqual(4, self.inst.nb_operations, 'wrong nb of operations')
+        self.assertEqual(16, self.inst.nb_operations, 'wrong nb of operations')
         self.assertEqual(4, len(self.inst.machines), 'wrong nb of machines')
         self.assertEqual(2, len(self.inst.jobs),  'wrong nb of jobs')
-        self.assertEqual('jsp1_M4_J2_O4', str(self.inst),  'wrong string representation of the instance')
-
+        self.assertEqual('jsp1_M4_J2_O16', str(self.inst), 'wrong string representation of the instance')
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

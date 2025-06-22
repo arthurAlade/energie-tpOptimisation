@@ -33,6 +33,10 @@ class Machine(object):
         self._stop_times = []
 
     @property
+    def is_feasible(self) -> bool:
+        return True
+
+    @property
     def set_up_time(self) -> int:
         return self._set_up_time
 
