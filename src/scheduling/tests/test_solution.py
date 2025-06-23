@@ -85,7 +85,7 @@ class TestSolution(unittest.TestCase):
         obj_val = sol.objective
         self.assertIsInstance(obj_val, (int, float), 'Objective value should be a number')
 
-    def test_schedule_op(self):
+    def test_schedule_op_2(self):
         job = self.inst.get_job(0)
         operation = job.operations[0]
 
